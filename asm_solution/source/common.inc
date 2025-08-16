@@ -1,0 +1,90 @@
+; functions
+
+
+write:
+	; arg 1 = rsi buffer
+	; arg 2 = rdx buffer size
+	push rax
+	push rdi
+	mov rax, 1
+	mov rdi, 1
+	syscall
+	pop rdi
+	pop rax
+	ret
+
+
+; exit statements
+
+
+exit_no_file:
+	lea rsi, [no_file]
+	mov rdx, no_file_len
+	call write
+	jmp exit
+
+exit_bad_file:
+	lea rsi, [bad_file]
+	mov rdx, bad_file_len
+	call write
+	jmp exit
+
+exit_read_fail:
+	lea rsi, [read_fail]
+	mov rdx, read_fail_len
+	call write
+	jmp exit
+
+exit_empty_file:
+	lea rsi, [empty_file]
+	mov rdx, empty_file_len
+	call write
+	jmp exit
+
+exit_size_fail:
+	lea rsi, [size_file]
+	mov rdx, size_file_len
+	call write
+	jmp exit
+
+something_else:
+	lea rsi, [undefined]
+	mov rdx, undefined_len
+	call write
+
+exit:
+	mov rax, 60
+	xor rdi, rdi
+	syscall
+
+
+; data
+
+
+section .bss
+	file_size resq 1
+	token_buffer_pointer resq 1
+	file_buffer_pointer resq 1
+
+section .data
+
+	no_file db "Specify a file as the first argument.", 10
+	no_file_len equ $ - no_file
+
+	bad_file db "Couldn't open the file.", 10
+	bad_file_len equ $ - bad_file
+
+	read_fail db "Couldn't read the file.", 10
+	read_fail_len equ $ - read_fail
+
+	empty_file db "The specified file is empty.", 10
+	empty_file_len equ $ - empty_file
+
+	size_file db "Something went wrong getting the file size.", 10
+	size_file_len equ $ - size_file
+
+	undefined db "Undefined error", 10
+	undefined_len equ $ - undefined
+
+	delimiters db " \n\t", 10
+	delimiters_len equ $ - delimiters
