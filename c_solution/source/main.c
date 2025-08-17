@@ -5,17 +5,18 @@
 
 
 int get_token_amount(char *file_buffer, char *delimiters, int size) {
-	char *internal_file_buffer;
+	char *internal_file_buffer = malloc(size + 1);;
 	memcpy(internal_file_buffer, file_buffer, size + 1);
 	char *save_prt;
 	char *token = strtok_r(internal_file_buffer, delimiters, &save_prt);
 	int token_count = 1;
 	while (1) {
-		printf(token);
+		// printf("%s\n", token);
 		token = strtok_r(NULL, delimiters, &save_prt);
 		if (token == NULL || token == "\0") break;
 		token_count++;
 	}
+	free(internal_file_buffer);
 	return token_count;
 }
 
@@ -28,7 +29,7 @@ void get_tokens(char *file_buffer, char *delimiters, char *token_buffer) {
 	}
 
 	while (1) {
-		printf(token);
+		// printf(token);
 		token = strtok_r(NULL, delimiters, &save_prt);
 		if (token == NULL || token == "\0") break;
 
@@ -41,10 +42,11 @@ void get_tokens(char *file_buffer, char *delimiters, char *token_buffer) {
 }
 
 int main(int argc, const char * argv[]) {
+	if (argc < 2) return 1;
 	FILE *fptr = fopen(argv[1], "r");
-	if (fptr == NULL) return 1;
+	if (fptr == NULL) return 2;
 	fseek(fptr, 0, SEEK_END);
-	long size = ftell(fptr);
+	int size = (int)ftell(fptr);
 	fseek(fptr, 0, SEEK_SET);
 	char *file_buffer = malloc(size + 1);
 	fread(file_buffer, size, 1, fptr);
@@ -55,6 +57,7 @@ int main(int argc, const char * argv[]) {
 	char *token_buffer = malloc(size + 1 + token_count);
 
 	get_tokens(file_buffer, delimiters, token_buffer);
+	printf(file_buffer);
 
 	free(token_buffer);
 	free(file_buffer);
