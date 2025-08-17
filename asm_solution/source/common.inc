@@ -77,12 +77,12 @@ exit:
 
 
 section .bss
+	file_pointer resq 1
 	file_size resq 1
 	token_buffer_pointer resq 1
 	file_buffer_pointer1 resq 1
 	file_buffer_pointer2 resq 1
 	save_pointer resq 1
-	file_pointer resq 1
 	token_count resq 1
 
 section .data

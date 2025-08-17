@@ -91,16 +91,11 @@ count_tokens_loop:
     js something_else
     cmp rax, 0
     je count_tokens_finished
-    mov rax, [token_count]
-    inc rax
-    mov qword [token_count], rax
+    inc qword [token_count]
     jmp count_tokens_loop
 
 count_tokens_finished:
-	mov rsi, token_count
-	mov rdx, 8
-	call write
+
 
     jmp exit
-
-    ;another three tokens
+;three more tokens
