@@ -34,7 +34,7 @@ get_file_size:
 allocate_file_buffer1:
     mov rax, 9
     xor rdi, rdi
-    mov rsi, [file_size]
+    mov rsi, qword [file_size]
     mov rdx, 3
     mov r10, 0x21
     xor r9, r9
@@ -46,7 +46,7 @@ allocate_file_buffer1:
 allocate_file_buffer2:
     mov rax, 9
     xor rdi, rdi
-    mov rsi, [file_size]
+    mov rsi, qword [file_size]
     mov rdx, 3
     mov r10, 0x21
     xor r9, r9
@@ -57,17 +57,17 @@ allocate_file_buffer2:
     mov qword [file_buffer_pointer2], rax
 copy_file1:
     xor rax, rax
-    mov rdi, [file_pointer]
-    mov rsi, [file_buffer_pointer1]
-    mov rdx, [file_size]
+    mov rdi, qword [file_pointer]
+    mov rsi, qword [file_buffer_pointer1]
+    mov rdx, qword [file_size]
     syscall
     test rax, rax
     js exit_read_fail
     call reset_file_ptr
 copy_file2:
     xor rax, rax
-    mov rsi, [file_buffer_pointer2]
-    mov rdx, [file_size]
+    mov rsi, qword [file_buffer_pointer2]
+    mov rdx, qword [file_size]
     syscall
     test rax, rax
     js exit_read_fail
@@ -77,7 +77,7 @@ close_file:
     test rax, rax
     js something_else
 count_tokens:
-    mov rdi, [file_buffer_pointer1]
+    mov rdi, qword [file_buffer_pointer1]
     mov rsi, delimiters
     mov rdx, save_pointer
     call strtok_r
@@ -90,11 +90,33 @@ count_tokens_loop:
     test rax, rax
     js something_else
     cmp rax, 0
-    je count_tokens_finished
+    je allocate_token_buffer
     inc qword [token_count]
     jmp count_tokens_loop
+allocate_token_buffer:
+    mov rax, 9
+    xor rdi, rdi
+    mov rsi, qword [file_size]
+    add rsi, qword [token_count]
+    mov rdx, 3
+    mov r10, 0x21
+    xor r9, r9
+    xor r8, r8
+    syscall
+    test rax, rax
+    js something_else
+    mov qword [token_buffer_pointer], rax
+tokenize:
+    mov rdi, qword [file_buffer_pointer2]
+    mov rsi, delimiters
+    mov rdx, save_pointer
+    call strtok_r
+    mov rdi, rax
+write_token_buffer:
+    call get_string_length
+write_token_buffer_loop:
+tokenize_loop:
 
-count_tokens_finished:
 
 
     jmp exit

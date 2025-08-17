@@ -29,6 +29,19 @@ reset_file_ptr:
 	ret
 
 
+get_string_length:
+	; arg 1 = rdi string
+	; rcx is overwritten
+	push rax
+	xor rax, rax
+	mov rcx, -1
+	cld ; set DF to 0 == UP -> increments rdi
+	repne scasb
+	not rcx
+	pop rax
+	ret
+
+
 ; exit statements
 
 
@@ -107,4 +120,3 @@ section .data
 	undefined_len equ $ - undefined
 
 	delimiters db 32,10,9,0
-	delimiters_len equ $ - delimiters
