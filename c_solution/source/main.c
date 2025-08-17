@@ -53,7 +53,7 @@ int main(int argc, const char * argv[]) {
 	char *delimiters = " \n\t";
 	int token_count = get_token_amount(file_buffer, delimiters, size);
 	char *token_buffer = malloc(size + 1 + token_count);
-	
+
 	get_tokens(file_buffer, delimiters, token_buffer);
 
 	free(token_buffer);

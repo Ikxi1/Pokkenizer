@@ -14,6 +14,21 @@ write:
 	ret
 
 
+reset_file_ptr:
+	; arg 1 = rdi file_ptr
+	push rax
+	push rsi
+	push rdx
+	mov rax, 8
+	mov rsi, 0
+	mov rdx, 0
+	syscall
+	pop rdx
+	pop rsi
+	pop rax
+	ret
+
+
 ; exit statements
 
 
@@ -64,9 +79,14 @@ exit:
 section .bss
 	file_size resq 1
 	token_buffer_pointer resq 1
-	file_buffer_pointer resq 1
+	file_buffer_pointer1 resq 1
+	file_buffer_pointer2 resq 1
+	save_pointer resq 1
+	file_pointer resq 1
+	token_count resq 1
 
 section .data
+	intermediate_file_buffer_size equ 1
 
 	no_file db "Specify a file as the first argument.", 10
 	no_file_len equ $ - no_file
@@ -86,5 +106,5 @@ section .data
 	undefined db "Undefined error", 10
 	undefined_len equ $ - undefined
 
-	delimiters db " \n\t", 10
+	delimiters db 32,10,9,0
 	delimiters_len equ $ - delimiters
