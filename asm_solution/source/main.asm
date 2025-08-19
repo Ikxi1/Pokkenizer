@@ -76,13 +76,13 @@ close_file:
     syscall
     test rax, rax
     js something_else
-count_tokens:
+count_pokkes:
     mov rdi, qword [file_buffer_pointer1]
     mov rsi, delimiters
     mov rdx, save_pointer
     call strtok_r
-    mov qword [token_count], 1
-count_tokens_loop:
+    mov qword [pokke_count], 1
+count_pokkes_loop:
     mov rdi, 0
     mov rsi, delimiters
     mov rdx, save_pointer
@@ -90,14 +90,14 @@ count_tokens_loop:
     test rax, rax
     js something_else
     cmp rax, 0
-    je allocate_token_buffer
-    inc qword [token_count]
-    jmp count_tokens_loop
-allocate_token_buffer:
+    je allocate_pokke_buffer
+    inc qword [pokke_count]
+    jmp count_pokkes_loop
+allocate_pokke_buffer:
     mov rax, 9
     xor rdi, rdi
     mov rsi, qword [file_size]
-    add rsi, qword [token_count]
+    add rsi, qword [pokke_count]
     mov rdx, 3
     mov r10, 0x21
     xor r9, r9
@@ -105,19 +105,59 @@ allocate_token_buffer:
     syscall
     test rax, rax
     js something_else
-    mov qword [token_buffer_pointer], rax
-tokenize:
+    mov qword [pokke_buffer_pointer], rax
+
+pokkenize:
     mov rdi, qword [file_buffer_pointer2]
     mov rsi, delimiters
     mov rdx, save_pointer
     call strtok_r
+write_pokke_buffer:
     mov rdi, rax
-write_token_buffer:
-    call get_string_length
-write_token_buffer_loop:
-tokenize_loop:
-
+    call get_string_length ; length in rcx
+    mov qword [string_position], rcx
+    mov r8, [pokke_buffer_pointer]
+    mov r9, r8
+    add r9, qword [string_position]
+write_pokke_buffer_loop:
+    mov dl, byte [rax]
+    mov [r8], byte dl
+    inc rax
+    inc r8
+    cmp r8, r9
+    jl write_pokke_buffer_loop
+    ; mov rsi, pokke_buffer_pointer
+    ; mov rdx, rcx
+    ; call write
+pokkenize_loop:
+    mov rdi, 0
+    mov rsi, delimiters
+    mov rdx, save_pointer
+    call strtok_r
+    test rax, rax
+    js something_else
+    cmp rax, 0
+    je what
+write_pokke_buffer2:
+    mov rdi, rax
+    call get_string_length ; length in rcx
+    mov r8, [pokke_buffer_pointer]
+    mov r9, r8
+    add r9, qword [string_position]
+write_pokke_buffer_loop2:
+    mov dl, byte [rax]
+    mov [r8], byte dl
+    inc rax
+    inc r8
+    cmp r8, r9
+    jl write_pokke_buffer_loop2
+    add [string_position], qword rcx
+    jmp pokkenize_loop
+what:
+    mov rsi, [pokke_buffer_pointer]
+    mov rdx, string_position
+    call write
 
 
     jmp exit
-;three more tokens
+;three more pokkes
