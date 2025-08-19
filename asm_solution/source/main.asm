@@ -36,7 +36,7 @@ allocate_file_buffer1:
     xor rdi, rdi
     mov rsi, qword [file_size]
     mov rdx, 3
-    mov r10, 0x21
+    mov r10, 0x22
     xor r9, r9
     xor r8, r8
     syscall
@@ -48,7 +48,7 @@ allocate_file_buffer2:
     xor rdi, rdi
     mov rsi, qword [file_size]
     mov rdx, 3
-    mov r10, 0x21
+    mov r10, 0x22
     xor r9, r9
     xor r8, r8
     syscall
@@ -99,7 +99,7 @@ allocate_pokke_buffer:
     mov rsi, qword [file_size]
     add rsi, qword [pokke_count]
     mov rdx, 3
-    mov r10, 0x21
+    mov r10, 0x22
     xor r9, r9
     xor r8, r8
     syscall
@@ -118,7 +118,7 @@ write_pokke_buffer:
     mov qword [string_position], rcx
     mov r8, [pokke_buffer_pointer]
     mov r9, r8
-    add r9, qword [string_position]
+    add r9, rcx
 write_pokke_buffer_loop:
     mov dl, byte [rax]
     mov [r8], byte dl
@@ -139,11 +139,12 @@ pokkenize_loop:
     cmp rax, 0
     je what
 write_pokke_buffer2:
-    mov rdi, rax
+    ; mov rdi, rax ; not needed, strtok_r does it
     call get_string_length ; length in rcx
-    mov r8, [pokke_buffer_pointer]
+    mov r8, qword [pokke_buffer_pointer]
+    add r8, qword [string_position]
     mov r9, r8
-    add r9, qword [string_position]
+    add r9, rcx
 write_pokke_buffer_loop2:
     mov dl, byte [rax]
     mov [r8], byte dl
@@ -155,7 +156,7 @@ write_pokke_buffer_loop2:
     jmp pokkenize_loop
 what:
     mov rsi, [pokke_buffer_pointer]
-    mov rdx, string_position
+    mov rdx, [string_position]
     call write
 
 
