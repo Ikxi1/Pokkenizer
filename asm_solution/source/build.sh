@@ -3,7 +3,7 @@ set -e
 
 OUT="pokkenizer"
 
-asm_files=$(find . -type f -name '*.asm' ! -path './source/ignore/*')
+asm_files=$(find . -type f -name '*.asm' ! -path './ignore/*')
 
 for src in $asm_files; do
     obj="${src%.asm}.o"

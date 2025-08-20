@@ -2,11 +2,16 @@
 section .text
 global main
 extern strtok_r
+extern ascii_to_bytes
 
 main:
 open_file:
+    cmp rdi, 3
+    jne argc_fail
+    mov rax, qword [rsi + 16]
+    mov [delimiter_pointer], qword rax
     mov rax, 2
-    mov rdi, [rsi + 8]
+    mov rdi, qword [rsi + 8]
     ; mov rdi, [rsp + 16]
     test rdi, rdi
     js exit_no_file
@@ -22,7 +27,7 @@ open_file:
 get_file_size:
     ; lseek syscall == fseek in c
     mov rax, 8
-    mov rdi, [file_pointer]
+    mov rdi, qword [file_pointer]
     mov rsi, 0
     mov rdx, 2
     syscall
@@ -105,7 +110,7 @@ allocate_pokke_buffer:
     syscall
     test rax, rax
     js something_else
-    mov qword [pokke_buffer_pointer], rax
+    mov [pokke_buffer_pointer], qword rax
 
 pokkenize:
     mov rdi, qword [file_buffer_pointer2]
@@ -115,7 +120,7 @@ pokkenize:
 write_pokke_buffer:
     mov rdi, rax
     call get_string_length ; length in rcx
-    mov qword [string_position], rcx
+    mov [string_position], qword rcx
     mov r8, [pokke_buffer_pointer]
     mov r9, r8
     add r9, rcx
@@ -165,5 +170,13 @@ what:
 
 get_delimiters:
     ; expects a string_ptr at rsi + 16
-    mov rdi, [rsi + 16]
+    mov rdi, [delimiter_pointer]
+    call get_string_length
+    sub rdi, rcx
+get_delimiters_loop:
+    call ascii_to_bytes
+    test rax, rax
+    js something_else
+    cmp rax, 0
+    jne get_delimiters_loop
     ret

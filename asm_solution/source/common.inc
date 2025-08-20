@@ -30,7 +30,7 @@ reset_file_ptr:
 
 
 get_string_length:
-	; arg 1 = rdi string
+	; arg 1 = rdi string_ptr
 	; rcx is overwritten
 	push rax
 	xor rax, rax
@@ -75,6 +75,12 @@ exit_size_fail:
 	call write
 	jmp exit
 
+argc_fail:
+	lea rsi, [argc_wrong]
+	mov rdx, argc_wrong_len
+	call write
+	jmp exit
+
 something_else:
 	lea rsi, [undefined]
 	mov rdx, undefined_len
@@ -103,6 +109,7 @@ section .bss
 	save_pointer resq 1
 	pokke_count resq 1
 	string_position resq 1
+	argv_pointer resq 1
 
 section .data
 	intermediate_file_buffer_size equ 1
@@ -124,5 +131,8 @@ section .data
 
 	undefined db "Undefined error", 10
 	undefined_len equ $ - undefined
+
+	argc_wrong db "Please specify an input file and delimiters.", 10
+	argc_wrong_len equ $ - argc_wrong
 
 	delimiters db 32,10,9,0

@@ -6,12 +6,12 @@ ascii_to_bytes:
 	xor rax, rax
     mov al, byte [rdi]
     cmp al, 0
-    jle error
+    jle .error
     cmp al, 0x7f
-    ja error
+    ja .error
 
     cmp al, "\"
-    jne normal
+    jne .normal
 
     ; escape handling
     mov al, byte [rdi+1]
@@ -19,6 +19,8 @@ ascii_to_bytes:
     je .esc_n
     cmp al, "t"
     je .esc_t
+    cmp al, "v"
+    je .esc_v
     cmp al, "r"
     je .esc_r
     cmp al, "0"
@@ -27,31 +29,39 @@ ascii_to_bytes:
     je .esc_backslash
     cmp al, "'"
     je .esc_single
-    cmp al, "\""
+    cmp al, '"'
     je .esc_double
+    cmp al, "f"
+    je .esc_f
     jmp .error
 
 .esc_n:
-	mov eax, 0x0a  ; newline        ; \n
+	mov eax, 0x0a ; \n
 	ret
 .esc_t:
-	mov eax, 0x09  ; tab            ; \t
+	mov eax, 0x09 ; tab \t
 	ret
+.esc_v:
+    mov eax, 0x0a ; vertical tab \v
+    ret
 .esc_r:
-	mov eax, 0x0d  ; carriage return; \r
+	mov eax, 0x0d ; carriage return \r
 	ret
 .esc_0:
-	xor eax, eax   ; NUL            ; \0
+	xor eax, eax ; 0
 	ret
 .esc_backslash:
-	mov eax, "\"   ; literal '\'
+	mov eax, "\"
 	ret
 .esc_single:
-	mov eax, "'"   ; literal '
+	mov eax, "'"
 	ret
 .esc_double:
-	mov eax, "\""  ; literal "
+	mov eax, '"'
 	ret
+.esc_f:
+    mov eax, 0x0c
+    ret
 
 .normal:
     movzx eax, byte [rdi]
