@@ -4,7 +4,7 @@
 #include <string.h>
 
 
-int get_token_amount(char *file_buffer, char *delimiters, int size) {
+int get_token_amount(const char *file_buffer, const char *delimiters, const int size) {
 	char *internal_file_buffer = malloc(size + 1);;
 	memcpy(internal_file_buffer, file_buffer, size + 1);
 	char *save_prt;
@@ -20,7 +20,7 @@ int get_token_amount(char *file_buffer, char *delimiters, int size) {
 	return token_count;
 }
 
-void get_tokens(char *file_buffer, char *delimiters, char *token_buffer) {
+void get_tokens(char *file_buffer, const char *delimiters, char *token_buffer) {
 	char *save_prt;
 	char *token = strtok_r(file_buffer, delimiters, &save_prt);
 	int string_position = (int)strlen(token) +1;
@@ -41,19 +41,19 @@ void get_tokens(char *file_buffer, char *delimiters, char *token_buffer) {
 	}
 }
 
-int main(int argc, const char * argv[]) {
+int main(const int argc, const char * argv[]) {
 	if (argc < 2) return 1;
 	FILE *fptr = fopen(argv[1], "r");
 	if (fptr == NULL) return 2;
 	fseek(fptr, 0, SEEK_END);
-	int size = (int)ftell(fptr);
+	const int size = (int)ftell(fptr);
 	fseek(fptr, 0, SEEK_SET);
 	char *file_buffer = malloc(size + 1);
 	fread(file_buffer, size, 1, fptr);
 	fclose(fptr);
 
-	char *delimiters = " \n\t";
-	int token_count = get_token_amount(file_buffer, delimiters, size);
+	const char *delimiters = " \n\t\0";
+	const int token_count = get_token_amount(file_buffer, delimiters, size);
 	char *token_buffer = malloc(size + 1 + token_count);
 
 	get_tokens(file_buffer, delimiters, token_buffer);
