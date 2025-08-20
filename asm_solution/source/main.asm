@@ -17,12 +17,12 @@ open_file:
     syscall
     test rax, rax
     js exit_bad_file
-    mov r11, rax
     mov qword [file_pointer], rax
+    call get_delimiters
 get_file_size:
     ; lseek syscall == fseek in c
     mov rax, 8
-    mov rdi, r11
+    mov rdi, [file_pointer]
     mov rsi, 0
     mov rdx, 2
     syscall
@@ -161,4 +161,9 @@ what:
 
 
     jmp exit
-;three more pokkes
+
+
+get_delimiters:
+    ; expects a string_ptr at rsi + 16
+    mov rdi, [rsi + 16]
+    ret

@@ -96,6 +96,7 @@ endless_loop:
 section .bss
 	file_pointer resq 1
 	file_size resq 1
+	delimiter_pointer resq 1
 	pokke_buffer_pointer resq 1
 	file_buffer_pointer1 resq 1
 	file_buffer_pointer2 resq 1
