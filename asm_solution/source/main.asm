@@ -23,7 +23,7 @@ open_file:
     test rax, rax
     js exit_bad_file
     mov qword [file_pointer], rax
-    call get_delimiters
+    ; call get_delimiters1
 get_file_size:
     ; lseek syscall == fseek in c
     mov rax, 8
@@ -83,13 +83,13 @@ close_file:
     js something_else
 count_pokkes:
     mov rdi, qword [file_buffer_pointer1]
-    mov rsi, delimiters
+    mov rsi, [delimiter_pointer]
     mov rdx, save_pointer
     call strtok_r
     mov qword [pokke_count], 1
 count_pokkes_loop:
     mov rdi, 0
-    mov rsi, delimiters
+    mov rsi, [delimiter_pointer]
     mov rdx, save_pointer
     call strtok_r
     test rax, rax
@@ -114,12 +114,12 @@ allocate_pokke_buffer:
 
 pokkenize:
     mov rdi, qword [file_buffer_pointer2]
-    mov rsi, delimiters
+    mov rsi, [delimiter_pointer]
     mov rdx, save_pointer
     call strtok_r
 write_pokke_buffer:
     mov rdi, rax
-    call get_string_length ; length in rcx
+    call get_string_length
     mov [string_position], qword rcx
     mov r8, [pokke_buffer_pointer]
     mov r9, r8
@@ -131,12 +131,9 @@ write_pokke_buffer_loop:
     inc r8
     cmp r8, r9
     jl write_pokke_buffer_loop
-    ; mov rsi, pokke_buffer_pointer
-    ; mov rdx, rcx
-    ; call write
 pokkenize_loop:
     mov rdi, 0
-    mov rsi, delimiters
+    mov rsi, [delimiter_pointer]
     mov rdx, save_pointer
     call strtok_r
     test rax, rax
@@ -144,8 +141,7 @@ pokkenize_loop:
     cmp rax, 0
     je what
 write_pokke_buffer2:
-    ; mov rdi, rax ; not needed, strtok_r does it
-    call get_string_length ; length in rcx
+    call get_string_length
     mov r8, qword [pokke_buffer_pointer]
     add r8, qword [string_position]
     mov r9, r8
@@ -160,23 +156,9 @@ write_pokke_buffer_loop2:
     add [string_position], qword rcx
     jmp pokkenize_loop
 what:
-    mov rsi, [pokke_buffer_pointer]
-    mov rdx, [string_position]
+    mov rsi, qword [pokke_buffer_pointer]
+    mov rdx, qword [string_position]
     call write
 
 
     jmp exit
-
-
-get_delimiters:
-    ; expects a string_ptr at rsi + 16
-    mov rdi, [delimiter_pointer]
-    call get_string_length
-    sub rdi, rcx
-get_delimiters_loop:
-    call ascii_to_bytes
-    test rax, rax
-    js something_else
-    cmp rax, 0
-    jne get_delimiters_loop
-    ret

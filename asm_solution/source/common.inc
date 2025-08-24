@@ -39,6 +39,8 @@ get_string_length:
 	repne scasb
 	not rcx
 	pop rax
+
+return:
 	ret
 
 

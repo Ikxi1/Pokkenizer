@@ -6,7 +6,7 @@ ascii_to_bytes:
 	xor rax, rax
     mov al, byte [rdi]
     cmp al, 0
-    jle .error
+    jle .done
     cmp al, 0x7f
     ja .error
 
@@ -14,7 +14,8 @@ ascii_to_bytes:
     jne .normal
 
     ; escape handling
-    mov al, byte [rdi+1]
+    add rdi, 1
+    mov al, byte [rdi]
     cmp al, "n"
     je .esc_n
     cmp al, "t"
@@ -23,8 +24,6 @@ ascii_to_bytes:
     je .esc_v
     cmp al, "r"
     je .esc_r
-    cmp al, "0"
-    je .esc_0
     cmp al, "\"
     je .esc_backslash
     cmp al, "'"
@@ -47,9 +46,6 @@ ascii_to_bytes:
 .esc_r:
 	mov eax, 0x0d ; carriage return \r
 	ret
-.esc_0:
-	xor eax, eax ; 0
-	ret
 .esc_backslash:
 	mov eax, "\"
 	ret
@@ -69,4 +65,8 @@ ascii_to_bytes:
 
 .error:
     mov rax, -1
+    ret
+
+.done:
+    mov rax, 0
     ret
