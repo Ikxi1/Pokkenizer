@@ -48,47 +48,67 @@ return:
 
 
 exit_no_file:
-	lea rsi, [no_file]
+	lea rsi, qword [no_file]
 	mov rdx, no_file_len
 	call write
 	jmp exit
 
 exit_bad_file:
-	lea rsi, [bad_file]
+	lea rsi, qword [bad_file]
 	mov rdx, bad_file_len
 	call write
 	jmp exit
 
 exit_read_fail:
-	lea rsi, [read_fail]
+	lea rsi, qword [read_fail]
 	mov rdx, read_fail_len
 	call write
 	jmp exit
 
 exit_empty_file:
-	lea rsi, [empty_file]
+	lea rsi, qword [empty_file]
 	mov rdx, empty_file_len
 	call write
 	jmp exit
 
 exit_size_fail:
-	lea rsi, [size_file]
+	lea rsi, qword [size_file]
 	mov rdx, size_file_len
 	call write
 	jmp exit
 
 argc_fail:
-	lea rsi, [argc_wrong]
+	lea rsi, qword [argc_wrong]
 	mov rdx, argc_wrong_len
 	call write
 	jmp exit
 
+file_too_big:
+	lea rsi, qword [file_big]
+	mov rdx, file_big_len
+	call write
+	jmp exit
+
 something_else:
-	lea rsi, [undefined]
+	lea rsi, qword [undefined]
 	mov rdx, undefined_len
 	call write
 
 exit:
+closefile:
+    mov rax, 3
+	mov rdi, qword [file_pointer]
+    syscall
+moommap:
+	mov rax, 11
+	mov rdi, qword [file_buffer_pointer]
+	mov rsi, qword [file_size]
+	syscall
+	mov rax, 11
+	mov rdi, qword [pokke_buffer_pointer]
+	shl rsi, 1
+	syscall
+quit:
 	mov rax, 60
 	xor rdi, rdi
 	syscall
@@ -102,12 +122,12 @@ endless_loop:
 
 
 section .bss
-	file_pointer resq 1
 	file_size resq 1
-	delimiter_pointer resq 1
+	file_pointer resq 1
+	delimiter_pointer1 resq 1
+	delimiter_pointer2 resq 1
 	pokke_buffer_pointer resq 1
-	file_buffer_pointer1 resq 1
-	file_buffer_pointer2 resq 1
+	file_buffer_pointer resq 1
 	save_pointer resq 1
 	pokke_count resq 1
 	string_position resq 1
@@ -136,5 +156,8 @@ section .data
 
 	argc_wrong db "Please specify an input file and delimiters.", 10
 	argc_wrong_len equ $ - argc_wrong
+
+	file_big db "Your file is way too big. Like >2^63-1 bytes.", 10
+	file_big_len equ $ - file_big
 
 	delimiters db 32,10,9,0

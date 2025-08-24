@@ -1,0 +1,12 @@
+file pokkenizer
+b pokkenize
+b pokkenize_pokkenize
+b write_pokke_buffer
+b write_pokke_buffer_loop
+b pokkenize_loop
+b pokkenize_pokkenize2
+b write_pokke_buffer2
+b write_pokke_buffer_loop2
+b pokkenize_pokkenize_loop
+b pokkenize_pokkenize_loop2
+run main.asm $' \n\t' $'%,;:."\/[]'
