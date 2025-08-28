@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "tokens.h"
 
 // Get the sub-tokens of a token
 void get_token_tokens (char *token, const char *persistent_delimiters, char *token_buffer, int *string_position) {
@@ -40,7 +41,16 @@ void get_tokens (char *file_buffer, const char *delimiters, const char *persiste
 }
 
 int main (const int argc, const char *argv[]) {
-	if (argc < 4) return 1;
+	const char *delimiters;
+	const char *persistent_delimiters;
+	if (argc < 3) {
+		printf("No delimiters were provided, running with default delimiters.");
+		delimiters = " \t\n";
+		persistent_delimiters = "+-*/\\,;()[]{}=\"\'#<>&|%";
+	} else {
+		delimiters = argv[2];
+		persistent_delimiters = argv[3];
+	}
 	FILE *fptr = fopen(argv[1], "r");
 	if (fptr == NULL) return 2;
 	fseek(fptr, 0, SEEK_END);
@@ -51,8 +61,6 @@ int main (const int argc, const char *argv[]) {
 	fread(file_buffer, size, 1, fptr);
 	fclose(fptr);
 
-	const char *delimiters = " \n\t";
-	const char *persistent_delimiters = "+-*/\\.,;:()[]{}\"\'=#<>&";
 	char *token_buffer = calloc(1, size*2 + 1);
 
 	get_tokens(file_buffer, delimiters, persistent_delimiters, token_buffer);
