@@ -5,22 +5,6 @@
 #include <unistd.h>
 
 
-// int get_token_amount (const char *file_buffer, const char *delimiters, const int size) {
-// 	char *internal_file_buffer = malloc(size + 1);;
-// 	memcpy(internal_file_buffer, file_buffer, size + 1);
-// 	char *save_prt;
-// 	char *token = strtok_r(internal_file_buffer, delimiters, &save_prt);
-// 	int token_count = 1;
-// 	while (1) {
-// 		// printf("%s\n", token);
-// 		token = strtok_r(NULL, delimiters, &save_prt);
-// 		if (token == NULL || token == "\0") break;
-// 		token_count++;
-// 	}
-// 	free(internal_file_buffer);
-// 	return token_count;
-// }
-
 // Get the sub-tokens of a token
 void get_token_tokens (char *token, const char *persistent_delimiters, char *token_buffer, int *string_position) {
 	char *save_ptr;
@@ -69,12 +53,9 @@ int main (const int argc, const char *argv[]) {
 
 	const char *delimiters = " \n\t";
 	const char *persistent_delimiters = "+-*/\\.,;:()[]{}\"\'=#<>&";
-	// const int token_count = get_token_amount(file_buffer, delimiters, size);
 	char *token_buffer = calloc(1, size*2 + 1);
 
 	get_tokens(file_buffer, delimiters, persistent_delimiters, token_buffer);
-	// printf(file_buffer);
-	// printf(token_buffer);
 	write(STDOUT_FILENO, token_buffer, size*2 + 1);
 
 	free(token_buffer);
