@@ -2,36 +2,52 @@
 
 #include <string.h>
 
-char *my_strtok_r (char *s, const char *delim, char **save_ptr) {
-	char *end;
-	if (s == NULL) s = *save_ptr;
+char *strtoktok_r (char *string, const char *delimiters, char **save_ptr, char *token_buffer, size_t *string_position) {
+	if (string == NULL) string = *save_ptr;
 
-	if (*s == '\0')	{
-		*save_ptr = s;
+	if (*string == '\0')	{
+		// *save_ptr = string;
 		return NULL;
 	}
 
-	/* Scan leading delimiters.  */
-	size_t leading = strspn (s, delim);
-	if (leading > 0) {
-		end = s + 1;
+	char *end;
 
+	/* Scan leading delimiters.  */
+	size_t leading = strspn (string, delimiters);
+	while (leading != 0) {
+		token_buffer[(*string_position)++] = string[0];
+		token_buffer[(*string_position)++] = '\0';
+		++string;
+		leading = strspn (string, delimiters);
 	}
-	s += leading;
-	if (*s == '\0')	{
-		*save_ptr = s;
+
+	if (*string == '\0') {
+		// *save_ptr = string;
 		return NULL;
 	}
 
 	/* Find the end of the token.  */
-	end = s + strcspn(s, delim);
+	size_t after = strcspn(string, delimiters);
+	memcpy(token_buffer + *string_position, string, after);
+	string += after;
+	*string_position += after;
+	token_buffer[(*string_position)++] = '\0';
+	if (*string == '\0') return NULL;
+	leading = strspn(string, delimiters);
+	while (leading != 0) {
+		token_buffer[(*string_position)++] = string[0];
+		token_buffer[(*string_position)++] = '\0';
+		++string;
+		leading = strspn(string, delimiters);
+	}
+	end = string;
 	if (*end == '\0')	{
-		*save_ptr = end;
-		return s;
+		// *save_ptr = end;
+		return NULL;
 	}
 
 	/* Terminate the token and make *SAVE_PTR point past it.  */
-	*end = '\0';
-	*save_ptr = end + 1;
-	return s;
+	// *end = '\0';
+	*save_ptr = end;
+	return string;
 }
