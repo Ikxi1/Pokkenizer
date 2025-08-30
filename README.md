@@ -33,3 +33,11 @@ This was only tested on ZSH, if it doesn't work in your Shell, please look up ho
 - SIMD and multi-threading features
 - GLIBC independant
 - Platform independant
+
+
+## License
+
+	No warranty.
+	Give credit (link this github repo for example).
+	Ask for commercial use.
+	Don't use it for evil.
