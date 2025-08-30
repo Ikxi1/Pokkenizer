@@ -1,20 +1,22 @@
+HELP
+
 %include "common.inc"
 section .text
 global main
 extern strtok_r
-extern ascii_to_bytes
+extern strtoktok_r
 
 main:
-open_file:
     cmp rdi, 4
     jne argc_fail
     mov rax, qword [rsi + 16]
     mov [delimiter_pointer1], qword rax
     mov rax, qword [rsi + 24]
     mov [delimiter_pointer2], qword rax
+open_file:
     mov rax, 2
     mov rdi, qword [rsi + 8]
-    ; mov rdi, [rsp + 16]
+    ; mov rdi, [rsp + 16] ; this is for when GCC isn't used
     test rdi, rdi
     js exit_no_file
     cmp rdi, 0
@@ -43,6 +45,7 @@ get_file_size:
 allocate_file_buffer:
     mov rax, 9
     xor rdi, rdi
+    add rsi, 1
     mov rdx, 3
     mov r10, 0x22
     xor r9, r9
@@ -66,10 +69,9 @@ close_file:
     test rax, rax
     js something_else
 allocate_pokke_buffer:
-    ; multiply filesize x2 for worst case scenario
-    clc
+    ; multiply file_size x2 for worst case scenario
     shl rdx, 1
-    jc file_too_big
+    add rdx, 1
     mov rsi, rdx
     mov rax, 9
     xor rdi, rdi
@@ -84,90 +86,44 @@ allocate_pokke_buffer:
 
 pokkenize:
     mov rdi, qword [file_buffer_pointer]
-    mov rsi, [delimiter_pointer1]
-    mov rdx, save_pointer
+    mov rsi, qword [delimiter_pointer1]
+    mov rdx, save_pointer1
     call strtok_r
-    mov r10, [save_pointer]
-    ; tokenize the token
-pokkenize_pokkenize:
-    mov rsi, [delimiter_pointer2]
-    mov rdx, save_pointer
-    call strtok_r
-    mov r11, [save_pointer]
-write_pokke_buffer:
-    call get_string_length
-    mov [string_position], qword rcx
-    mov r8, qword [pokke_buffer_pointer]
-    mov r9, r8
-    add r9, rcx
-write_pokke_buffer_loop:
-    mov dl, byte [rax]
-    mov [r8], byte dl
-    inc rax
-    inc r8
-    cmp r8, r9
-    jl write_pokke_buffer_loop
-    mov rdi, qword [save_pointer]
-    xor rsi, rsi
-    movzx rdi, byte [rdi]
-    cmp rsi, rdi
-    jne pokkenize_pokkenize_loop
-    inc qword [save_pointer]
-
+    call get_token_tokens
 pokkenize_loop:
-    mov rdi, 0
-    mov rsi, [delimiter_pointer1]
-    mov rdx, save_pointer
+    mov rdi, qword [file_buffer_pointer]
+    mov rsi, qword [delimiter_pointer1]
+    mov rdx, save_pointer1
     call strtok_r
-    test rax, rax
-    js something_else
     cmp rax, 0
     je write_tokens
-    mov r10, [save_pointer]
-pokkenize_pokkenize2:
-    mov rsi, [delimiter_pointer2]
-    mov rdx, save_pointer
-    call strtok_r
-
-write_pokke_buffer2:
-    call get_string_length
-    mov r8, qword [pokke_buffer_pointer]
-    add r8, qword [string_position]
-    mov r9, r8
-    add r9, rcx
-write_pokke_buffer_loop2:
-    mov dl, byte [rax]
-    mov [r8], byte dl
-    inc rax
-    inc r8
-    cmp r8, r9
-    jl write_pokke_buffer_loop2
-    add [string_position], qword rcx
-    mov rdi, qword [save_pointer]
-    xor rsi, rsi
-    movzx rdi, byte [rdi]
-    cmp rsi, rdi
-    jne pokkenize_pokkenize_loop2
-    inc qword [save_pointer]
+    call get_token_tokens
     jmp pokkenize_loop
-
-pokkenize_pokkenize_loop:
-    mov rdi, 0
-    mov rsi, [delimiter_pointer2]
-    mov rdx, save_pointer
-    call strtok_r
-    jmp write_pokke_buffer
-
-pokkenize_pokkenize_loop2:
-    mov rdi, 0
-    mov rsi, [delimiter_pointer2]
-    mov rdx, save_pointer
-    call strtok_r
-    jmp write_pokke_buffer2
 
 write_tokens:
     mov rsi, qword [pokke_buffer_pointer]
-    mov rdx, qword [string_position]
+    mov rdx, qword [file_size]
+    shl rdx, 1
+    inc rdx
     call write
 
     jmp exit
+
+get_token_tokens:
+    mov rdi, rax
+    mov rsi, qword [delimiter_pointer2]
+    mov rdx, save_pointer2
+    mov rcx, qword [pokke_buffer_pointer]
+    call strtoktok_r
+    cmp rax, 0
+    jne get_token_tokens_loop
+    ret
+get_token_tokens_loop:
+    mov rdi, 0
+    mov rsi, qword [delimiter_pointer2]
+    mov rdx, save_pointer2
+    mov rcx, qword [pokke_buffer_pointer]
+    call strtoktok_r
+    cmp rax, 0
+    jne get_token_tokens_loop
+    ret

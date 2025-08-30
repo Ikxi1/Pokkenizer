@@ -34,10 +34,9 @@ get_string_length:
 	; rcx is overwritten
 	push rax
 	xor rax, rax
-	mov rcx, -1
+	mov rcx, 0
 	cld ; set DF to 0 == UP -> increments rdi
 	repne scasb
-	not rcx
 	pop rax
 
 return:
@@ -128,10 +127,9 @@ section .bss
 	delimiter_pointer2 resq 1
 	pokke_buffer_pointer resq 1
 	file_buffer_pointer resq 1
-	save_pointer resq 1
-	pokke_count resq 1
-	string_position resq 1
-	argv_pointer resq 1
+	save_pointer1 resq 1
+	save_pointer2 resq 1
+
 
 section .data
 	intermediate_file_buffer_size equ 1

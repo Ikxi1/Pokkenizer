@@ -9,21 +9,13 @@
 
 // Get the sub-tokens of a token
 void get_token_tokens (char *token, const char *persistent_delimiters, char *token_buffer) {
-	static size_t string_position = 0;
 	char *save_ptr;
-	char *token2 = strtoktok_r(token, persistent_delimiters, &save_ptr, token_buffer, &string_position);
-	if (token2 == NULL || *token2 == '\0') return;
-	// int token_length = (int)strlen(token2) + 1;
-	// memcpy(token_buffer + string_position, token2, token_length);
-	// string_position += token_length;
+	char *token2 = strtoktok_r(token, persistent_delimiters, &save_ptr, token_buffer);
+	if (token2 == NULL) return;
 
 	while (1) {
-		token2 = strtoktok_r(NULL, persistent_delimiters, &save_ptr, token_buffer, &string_position);
-		if (token2 == NULL || token2 == "\0") return;
-
-		// token_length = (int)strlen(token2) + 1;
-		// memcpy(token_buffer + string_position, token2, token_length);
-		// string_position += token_length;
+		token2 = strtoktok_r(NULL, persistent_delimiters, &save_ptr, token_buffer);
+		if (token2 == NULL) return;
 	}
 }
 
