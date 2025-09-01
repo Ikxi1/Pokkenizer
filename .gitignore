@@ -1,4 +1,4 @@
 .idea/
-/pokkenizer
-/*.o
+pokkenizer
+*.o
 lorem_ipsum.txt
