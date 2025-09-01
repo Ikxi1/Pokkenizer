@@ -1,5 +1,3 @@
-HELP
-
 %include "common.inc"
 section .text
 global main
@@ -7,6 +5,9 @@ extern strtok_r
 extern strtoktok_r
 
 main:
+    ; push rbp
+    ; mov rbp, rsp
+    ; sub rsp, 8
     cmp rdi, 4
     jne argc_fail
     mov rax, qword [rsi + 16]
@@ -91,7 +92,7 @@ pokkenize:
     call strtok_r
     call get_token_tokens
 pokkenize_loop:
-    mov rdi, qword [file_buffer_pointer]
+    mov rdi, 0
     mov rsi, qword [delimiter_pointer1]
     mov rdx, save_pointer1
     call strtok_r
@@ -99,6 +100,7 @@ pokkenize_loop:
     je write_tokens
     call get_token_tokens
     jmp pokkenize_loop
+
 
 write_tokens:
     mov rsi, qword [pokke_buffer_pointer]
@@ -110,19 +112,18 @@ write_tokens:
     jmp exit
 
 get_token_tokens:
-    mov rdi, rax
+    ; string already in rdi
     mov rsi, qword [delimiter_pointer2]
-    mov rdx, save_pointer2
     mov rcx, qword [pokke_buffer_pointer]
+    mov r8, string_position
     call strtoktok_r
     cmp rax, 0
     jne get_token_tokens_loop
     ret
 get_token_tokens_loop:
-    mov rdi, 0
     mov rsi, qword [delimiter_pointer2]
-    mov rdx, save_pointer2
     mov rcx, qword [pokke_buffer_pointer]
+    mov r8, string_position
     call strtoktok_r
     cmp rax, 0
     jne get_token_tokens_loop

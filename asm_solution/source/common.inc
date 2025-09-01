@@ -108,6 +108,7 @@ moommap:
 	shl rsi, 1
 	syscall
 quit:
+	; leave
 	mov rax, 60
 	xor rdi, rdi
 	syscall
@@ -129,6 +130,7 @@ section .bss
 	file_buffer_pointer resq 1
 	save_pointer1 resq 1
 	save_pointer2 resq 1
+	string_position resq 1
 
 
 section .data
