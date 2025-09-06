@@ -1,23 +1,29 @@
 %include "common.inc"
 section .text
-global main
+global get_pokke_buffer
 extern strtok_r
 extern strtoktok_r
 
-main:
-    ; push rbp
-    ; mov rbp, rsp
-    ; sub rsp, 8
-    cmp rdi, 4
-    jne argc_fail
-    mov rax, qword [rsi + 16]
-    mov [delimiter_pointer1], qword rax
-    mov rax, qword [rsi + 24]
-    mov [delimiter_pointer2], qword rax
+; arg 1  = rdi const char *file name
+; arg 2  = rsi const char *delimiters
+; arg 3  = rdx const char *persistent delimiters
+; return = rax char *token buffer
+
+get_pokke_buffer:
+    enter 0, 0
+
+    mov [delimiter_pointer1], rsi
+    mov [delimiter_pointer2], rdx
+    ; when called from the command line, maybe to pipe into sth else
+    ; cmp rdi, 4
+    ; jne argc_fail
+    ; mov rax, qword [rsi + 16]
+    ; mov [delimiter_pointer1], qword rax
+    ; mov rax, qword [rsi + 24]
+    ; mov [delimiter_pointer2], qword rax
 open_file:
     mov rax, 2
-    mov rdi, qword [rsi + 8]
-    ; mov rdi, [rsp + 16] ; this is for when GCC isn't used
+    ; file_name already in rdi
     test rdi, rdi
     js exit_no_file
     cmp rdi, 0
@@ -97,19 +103,35 @@ pokkenize_loop:
     mov rdx, save_pointer1
     call strtok_r
     cmp rax, 0
-    je write_tokens
+    je end                 ; write_tokens or end, based on if you call it in another program or want to pipe the output
     call get_token_tokens
     jmp pokkenize_loop
 
+    ; when used inside another program
+end:
+closefile:
+    mov rax, 3
+	mov rdi, qword [file_pointer]
+    syscall
+moommap:
+	mov rax, 11
+	mov rdi, qword [file_buffer_pointer]
+	mov rsi, qword [file_size]
+    add rsi, 1 ; \0
+	syscall
+    mov rax, [pokke_buffer_pointer]
+    leave
+    ret
 
-write_tokens:
-    mov rsi, qword [pokke_buffer_pointer]
-    mov rdx, qword [file_size]
-    shl rdx, 1
-    inc rdx
-    call write
+    ; when used standalone, but why
+; write_tokens:
+;     mov rsi, qword [pokke_buffer_pointer]
+;     mov rdx, qword [file_size]
+;     shl rdx, 1
+;     inc rdx
+;     call write
 
-    jmp exit
+;     jmp exit
 
 get_token_tokens:
     ; string already in rdi

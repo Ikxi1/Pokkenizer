@@ -102,10 +102,12 @@ moommap:
 	mov rax, 11
 	mov rdi, qword [file_buffer_pointer]
 	mov rsi, qword [file_size]
+	add rsi, 1 ; \0
 	syscall
 	mov rax, 11
 	mov rdi, qword [pokke_buffer_pointer]
 	shl rsi, 1
+	add rsi, 1 ; \0
 	syscall
 quit:
 	; leave
