@@ -28,6 +28,7 @@ This was only tested on ZSH, if it doesn't work in your Shell, please look up ho
 
 ### Planned features:
 
+- Check if delimiters1 or 2 are nothing -> skip the loops
 
 #### In the near future:
 
